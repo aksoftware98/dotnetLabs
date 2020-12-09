@@ -1,7 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\dotNetLabs.Blazor\Shared\dotNetLabs.Shared.csproj" />
+    <ProjectReference Include="..\dotNetLabs.Repositories\dotNetLabs.Repositories.csproj" />
+    <ProjectReference Include="..\dotNetLabs.Server.Infrastructure\dotNetLabs.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\dotNetLabs.Server.Models\dotNetLabs.Server.Models.csproj" />
+  </ItemGroup>
 
 </Project>

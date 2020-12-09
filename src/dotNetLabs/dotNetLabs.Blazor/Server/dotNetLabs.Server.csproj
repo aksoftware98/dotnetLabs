@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0">
@@ -14,7 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\dotNetLabs.Repositories\dotNetLabs.Repositories.csproj" />
+    <ProjectReference Include="..\..\dotNetLabs.Server.Infrastructure\dotNetLabs.Server.Infrastructure.csproj" />
     <ProjectReference Include="..\..\dotNetLabs.Server.Models\dotNetLabs.Server.Models.csproj" />
+    <ProjectReference Include="..\..\dotNetLabs.Server.Services\dotNetLabs.Server.Services.csproj" />
     <ProjectReference Include="..\Client\dotNetLabs.Blazor.csproj" />
     <ProjectReference Include="..\Shared\dotNetLabs.Shared.csproj" />
   </ItemGroup>
