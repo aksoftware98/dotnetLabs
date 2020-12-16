@@ -11,7 +11,7 @@ namespace dotNetLabs.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -29,6 +29,7 @@ namespace dotNetLabs.Server.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+           
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

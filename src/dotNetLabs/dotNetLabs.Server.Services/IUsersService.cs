@@ -1,5 +1,6 @@
 ﻿using dotNetLabs.Repositories;
 using dotNetLabs.Server.Infrastructure;
+using dotNetLabs.Server.Models.Models;
 using dotNetLabs.Shared;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -14,9 +15,9 @@ namespace dotNetLabs.Server.Services
     public interface IUsersService
     {
 
-        //Task RegisterUserAsync();
+        Task<OperationResponse<string>> RegisterUserAsync(RegisterRequest model);
 
-        Task<object> GenerateTokenAsync(LoginRequest model);
+        Task<LoginResponse> GenerateTokenAsync(LoginRequest model);
 
     }
 
@@ -32,19 +33,25 @@ namespace dotNetLabs.Server.Services
             _authOptions = authOptions;
         }
 
-        public async Task<object> GenerateTokenAsync(LoginRequest model)
+        public async Task<LoginResponse> GenerateTokenAsync(LoginRequest model)
         {
             var user = await _unitOfWork.Users.GetUserByEmailAsync(model.Email); 
             if(user == null)
             {
-                // TODO: Return response with message user not found
-                return null; 
+                return new LoginResponse
+                {
+                    Message = "Invalid username or password",
+                    IsSuccess = false
+                };
             }
 
             if(!(await _unitOfWork.Users.CheckPasswordAsync(user, model.Password)))
             {
-
-                return null; 
+                return new LoginResponse
+                {
+                    Message = "Invalid username or password",
+                    IsSuccess = false
+                };
             }
 
             var userRole = await _unitOfWork.Users.GetUserRoleAsync(user);
@@ -59,22 +66,52 @@ namespace dotNetLabs.Server.Services
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authOptions.Key));
-
+            var expireDate = DateTime.Now.AddDays(30);
             var token = new JwtSecurityToken(
                 issuer: _authOptions.Issuer,
                 audience: _authOptions.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddDays(30),
+                expires: expireDate,
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
             string tokenAsString = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return new 
+            return new LoginResponse
             {
+                Message = "Welcome to dotNet Labs",
+                IsSuccess = true,
                 AccessToken = tokenAsString,
-                ExpireDate = token.ValidTo
+                ExpiryDate = expireDate
+            };
+        }
+
+        public async Task<OperationResponse<string>> RegisterUserAsync(RegisterRequest model)
+        {
+            var userByEmail = await _unitOfWork.Users.GetUserByEmailAsync(model.Email); 
+            if(userByEmail != null)
+            {
+                return new OperationResponse<string>
+                {
+                    IsSuccess = false,
+                    Message = "User is already exists",
+                };
+            }
+
+            var user = new ApplicationUser
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                UserName = model.Email
             };
 
+            await _unitOfWork.Users.CreateUserAsync(user, model.Password, "User");
+
+            return new OperationResponse<string>
+            {
+                Message = "Welcome to donNet Labs",
+                IsSuccess = true
+            };
         }
     }
 }

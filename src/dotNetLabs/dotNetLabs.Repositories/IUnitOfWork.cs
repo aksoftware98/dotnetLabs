@@ -13,8 +13,9 @@ namespace dotNetLabs.Repositories
     {
 
         IUsersRepository Users { get; }
+        IPlaylistsRepository Playlists { get; }
 
-        Task CommitChangesAsync();
+        Task CommitChangesAsync(string userId);
     }
 
     public class EfUnitOfWork : IUnitOfWork
@@ -45,9 +46,21 @@ namespace dotNetLabs.Repositories
             }
         }
 
-        public async Task CommitChangesAsync()
+        private IPlaylistsRepository _playlists;
+        public IPlaylistsRepository Playlists
         {
-            await _db.SaveChangesAsync();
+            get
+            {
+                if (_playlists == null)
+                    _playlists = new PlaylistsRepository(_db);
+
+                return _playlists;
+            }
+        }
+
+        public async Task CommitChangesAsync(string userId)
+        {
+            await _db.SaveChangesAsync(userId);
         }
     }
 

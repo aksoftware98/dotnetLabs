@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using dotNetLabs.Server.Services;
+using dotNetLabs.Shared;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +9,38 @@ using System.Threading.Tasks;
 
 namespace dotNetLabs.Server.Controllers
 {
-    public class AuthenticationController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthenticationController : ControllerBase
     {
-        public IActionResult Index()
+
+        private readonly IUsersService _usersService;
+
+        public AuthenticationController(IUsersService usersSerivce)
         {
-            return View();
+            _usersService = usersSerivce; 
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginRequest model)
+        {
+            var result = await _usersService.GenerateTokenAsync(model);
+            if (result.IsSuccess)
+                return Ok(result);
+            
+            return BadRequest(result);
+        }
+
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register(RegisterRequest model)
+        {
+            var result = await _usersService.RegisterUserAsync(model);
+            if (result.IsSuccess)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
     }
 }
