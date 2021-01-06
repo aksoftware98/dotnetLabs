@@ -4,6 +4,7 @@ using dotNetLabs.Server.Models;
 using dotNetLabs.Server.Models.DataSeeding;
 using dotNetLabs.Server.Models.Models;
 using dotNetLabs.Server.Services;
+using dotNetLabs.Server.Services.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -106,6 +107,9 @@ namespace dotNetLabs.Server
             // TODO: Using attributes to register the services
             services.AddScoped<IUsersService, UsersService>(); 
             services.AddScoped<IPlaylistService, PlaylistsService>(); 
+            services.AddScoped<IVideosService, VideosService>(); 
+
+            services.AddScoped<IFilesStorageService, LocalFilesStorageService>(); 
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -115,6 +119,7 @@ namespace dotNetLabs.Server
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<ApplicationUser> userManager,
                               RoleManager<IdentityRole> roleManager)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
