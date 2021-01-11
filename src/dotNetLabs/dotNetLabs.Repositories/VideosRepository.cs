@@ -23,12 +23,12 @@ namespace dotNetLabs.Repositories
 
         public IEnumerable<Video> GetAll()
         {
-            return _db.Videos;
+            return _db.Videos.Include(v => v.Tags);
         }
 
         public async Task<Video> GetByIdAsync(string id)
         {
-            return await _db.Videos.FindAsync(id);
+            return await _db.Videos.Include(v => v.Tags).SingleOrDefaultAsync(v => v.Id == id);
         }
 
         public async Task<Video> GetByTitleAsync(string title)
@@ -39,6 +39,11 @@ namespace dotNetLabs.Repositories
         public void Remove(Video video)
         {
             _db.Videos.Remove(video);
+        }
+
+        public void RemoveTags(Video video)
+        {
+            _db.Tags.RemoveRange(video.Tags); 
         }
     }
 }

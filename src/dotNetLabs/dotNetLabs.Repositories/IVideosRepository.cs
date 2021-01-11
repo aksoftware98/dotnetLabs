@@ -14,6 +14,7 @@ namespace dotNetLabs.Repositories
         IEnumerable<Video> GetAll();
         Task<Video> GetByTitleAsync(string name); 
         Task<Video> GetByIdAsync(string id);
+        void RemoveTags(Video video);
 
     }
 }

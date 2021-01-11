@@ -1,8 +1,10 @@
+using AutoMapper;
 using dotNetLabs.Repositories;
 using dotNetLabs.Server.Infrastructure;
 using dotNetLabs.Server.Models;
 using dotNetLabs.Server.Models.DataSeeding;
 using dotNetLabs.Server.Models.Models;
+using dotNetLabs.Server.Models.Profiles;
 using dotNetLabs.Server.Services;
 using dotNetLabs.Server.Services.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -102,6 +104,13 @@ namespace dotNetLabs.Server
                 return identityOptions;
             });
 
+            services.AddSingleton(sp =>
+            {
+                return new EnvironmentOptions()
+                {
+                    ApiUrl = Configuration["ApiUrl"]
+                };
+            });
 
             services.AddHttpContextAccessor();
             // TODO: Using attributes to register the services
@@ -109,7 +118,13 @@ namespace dotNetLabs.Server
             services.AddScoped<IPlaylistService, PlaylistsService>(); 
             services.AddScoped<IVideosService, VideosService>(); 
 
-            services.AddScoped<IFilesStorageService, LocalFilesStorageService>(); 
+            services.AddScoped<IFilesStorageService, LocalFilesStorageService>();
+            services.AddSingleton(provider => new MapperConfiguration(config =>
+            {
+                config.AddProfile(new VideoProfile(provider.GetService<EnvironmentOptions>()));
+            }).CreateMapper());
+
+            //services.AddAutoMapper(typeof(VideoProfile));
 
             services.AddControllersWithViews();
             services.AddRazorPages();

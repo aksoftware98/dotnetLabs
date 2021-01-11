@@ -1,4 +1,5 @@
-﻿using dotNetLabs.Repositories;
+﻿using AutoMapper;
+using dotNetLabs.Repositories;
 using dotNetLabs.Server.Infrastructure;
 using dotNetLabs.Server.Models.Models;
 using dotNetLabs.Server.Services.Utilities;
@@ -17,7 +18,7 @@ namespace dotNetLabs.Server.Services
         Task<OperationResponse<VideoDetail>> CreateAsync(VideoDetail model);
         Task<OperationResponse<VideoDetail>> UpdateAsync(VideoDetail model);
         Task<OperationResponse<VideoDetail>> RemoveAsync(string id);
-        CollectionResponse<VideoDetail> GetAllVideos(int pageNumber = 1, int pageSize = 10);
+        CollectionResponse<VideoDetail> GetAllVideos(string query, int pageNumber = 1, int pageSize = 10);
     }
 
     public class VideosService : IVideosService
@@ -26,14 +27,21 @@ namespace dotNetLabs.Server.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IdentityOptions _identity;
         private readonly IFilesStorageService _storage;
-        
+        private readonly EnvironmentOptions _env;
+        private readonly IMapper _mapper; 
+
+
         public VideosService(IUnitOfWork unitOfWork,
                              IdentityOptions identity,
-                             IFilesStorageService storage)
+                             IFilesStorageService storage,
+                             EnvironmentOptions env,
+                             IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _identity = identity;
             _storage = storage;
+            _env = env;
+            _mapper = mapper; 
         }
 
         public async Task<OperationResponse<VideoDetail>> CreateAsync(VideoDetail model)
@@ -91,7 +99,7 @@ namespace dotNetLabs.Server.Services
             model.Id = video.Id;
             model.ThumpFile = null;
             // TODO: Get the URL of the running API and replace the hardcoded one 
-            model.ThumpUrl = $"https://localhost:44377/{thumpUrl}";
+            model.ThumpUrl = $"{_env.ApiUrl}/{thumpUrl}";
 
             return new OperationResponse<VideoDetail>
             {
@@ -101,19 +109,124 @@ namespace dotNetLabs.Server.Services
             }; 
         }
 
-        public CollectionResponse<VideoDetail> GetAllVideos(int pageNumber = 1, int pageSize = 10)
+        public CollectionResponse<VideoDetail> GetAllVideos(string query, int pageNumber = 1, int pageSize = 10)
         {
-            throw new NotImplementedException();
+            if (pageNumber < 1)
+                pageNumber = 1;
+
+            if (pageSize < 5)
+                pageSize = 5;
+
+            if (pageSize > 50)
+                pageSize = 50;
+
+            var videos = _unitOfWork.Videos.GetAll();
+            int videosCount = videos.Count();
+
+            var videosInPage = videos
+                                 .Where(v => v.Title.Contains(query, StringComparison.InvariantCultureIgnoreCase) 
+                                            || v.Description.Contains(query, StringComparison.InvariantCultureIgnoreCase))
+                                 .Skip((pageNumber - 1) * pageSize)
+                                 .Take(pageSize)
+                                 .Select(p => _mapper.Map<VideoDetail>(p));
+
+            int pagesCount = videosCount / pageSize;
+            if ((videosCount % pageSize) != 0)
+                pagesCount++;
+
+            return new CollectionResponse<VideoDetail>
+            {
+                IsSuccess = true,
+                Message = "Videos retrieved successfully!",
+                Records = videosInPage.ToArray(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                PagesCount = pagesCount
+            };
+
         }
 
-        public Task<OperationResponse<VideoDetail>> RemoveAsync(string id)
+        public async Task<OperationResponse<VideoDetail>> RemoveAsync(string id)
         {
-            throw new NotImplementedException();
+            var video = await _unitOfWork.Videos.GetByIdAsync(id);
+
+            if (video == null)
+                return new OperationResponse<VideoDetail>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Video not found"
+                };
+
+            _unitOfWork.Videos.RemoveTags(video);
+            // TODO: Remove the comments and the playsist assingments 
+            _unitOfWork.Videos.Remove(video);
+            _storage.RemoveFile(video.ThumpUrl); 
+
+            await _unitOfWork.CommitChangesAsync(_identity.UserId);
+
+            return new OperationResponse<VideoDetail>
+            {
+                IsSuccess = true,
+                Message = "Video has been deleted successfully!",
+                Data = _mapper.Map<VideoDetail>(video),
+            };
         }
 
-        public Task<OperationResponse<VideoDetail>> UpdateAsync(VideoDetail model)
+        public async Task<OperationResponse<VideoDetail>> UpdateAsync(VideoDetail model)
         {
-            throw new NotImplementedException();
+            var video = await _unitOfWork.Videos.GetByIdAsync(model.Id);
+
+            if (video == null)
+                return new OperationResponse<VideoDetail>
+                {
+                    IsSuccess = false,
+                    Data = null,
+                    Message = "Video not found"
+                };
+
+            // Check the thump image
+            string thumpUrl = video.ThumpUrl;
+            if(model.ThumpFile != null)
+            {
+                try
+                {
+                    thumpUrl = await _storage.SaveFileAsync(model.ThumpFile, "Uploads");
+                    _storage.RemoveFile(video.ThumpUrl); 
+                }
+                catch (BadImageFormatException)
+                {
+                    return new OperationResponse<VideoDetail>
+                    {
+                        IsSuccess = false,
+                        Message = "Please upload a valid image file"
+                    };
+                }
+            }
+
+            _unitOfWork.Videos.RemoveTags(video); 
+
+            video.Title = model.Title;
+            video.Description = model.Description;
+            video.Privacy = model.Privacy;
+            video.Category = model.Category;
+            video.PublishingDate = model.PublishingDate;
+            video.ThumpUrl = thumpUrl; 
+            video.Tags = model.Tags?.Select(t => new Tag
+            {
+                Name = t,
+            }).ToList(); 
+            
+            await _unitOfWork.CommitChangesAsync(_identity.UserId);
+
+            model.ThumpUrl = $"{_env.ApiUrl}/{thumpUrl}";
+
+            return new OperationResponse<VideoDetail>
+            {
+                IsSuccess = true,
+                Message = "Video has been updated successfully!",
+                Data = model
+            };
         }
     }
 }
