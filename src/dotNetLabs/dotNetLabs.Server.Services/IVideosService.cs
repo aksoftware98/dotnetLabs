@@ -18,6 +18,7 @@ namespace dotNetLabs.Server.Services
         Task<OperationResponse<VideoDetail>> CreateAsync(VideoDetail model);
         Task<OperationResponse<VideoDetail>> UpdateAsync(VideoDetail model);
         Task<OperationResponse<VideoDetail>> RemoveAsync(string id);
+        Task<OperationResponse<VideoDetail>> GetVideoDetailAsync(string videoId); 
         CollectionResponse<VideoDetail> GetAllVideos(string query, int pageNumber = 1, int pageSize = 10);
     }
 
@@ -28,20 +29,22 @@ namespace dotNetLabs.Server.Services
         private readonly IdentityOptions _identity;
         private readonly IFilesStorageService _storage;
         private readonly EnvironmentOptions _env;
-        private readonly IMapper _mapper; 
-
+        private readonly IMapper _mapper;
+        private readonly ICommentsService _commentsService;
 
         public VideosService(IUnitOfWork unitOfWork,
                              IdentityOptions identity,
                              IFilesStorageService storage,
                              EnvironmentOptions env,
-                             IMapper mapper)
+                             IMapper mapper,
+                             ICommentsService commentsService)
         {
             _unitOfWork = unitOfWork;
             _identity = identity;
             _storage = storage;
             _env = env;
-            _mapper = mapper; 
+            _mapper = mapper;
+            _commentsService = commentsService; 
         }
 
         public async Task<OperationResponse<VideoDetail>> CreateAsync(VideoDetail model)
@@ -144,6 +147,29 @@ namespace dotNetLabs.Server.Services
                 PagesCount = pagesCount
             };
 
+        }
+
+        public async Task<OperationResponse<VideoDetail>> GetVideoDetailAsync(string videoId)
+        {
+            var video = await _unitOfWork.Videos.GetByIdAsync(videoId);
+            if (video == null)
+                return new OperationResponse<VideoDetail>
+                {
+                    IsSuccess = false,
+                    Message = "Video cannot be found"
+                };
+
+            var videoDetail = _mapper.Map<VideoDetail>(video);
+
+            // Get all the comments of the video 
+            videoDetail.Comments = _commentsService.GetVideoComments(videoId);
+
+            return new OperationResponse<VideoDetail>
+            {
+                IsSuccess = true,
+                Data = videoDetail,
+                Message = "Video retrieved successfully!"
+            };
         }
 
         public async Task<OperationResponse<VideoDetail>> RemoveAsync(string id)

@@ -18,6 +18,7 @@ namespace dotNetLabs.Server.Models.Models
         public virtual List<Comment> Replys { get; set; }
 
         public virtual Comment ParentComment { get; set; }
+
         [ForeignKey(nameof(ParentComment))]
         public string ParentCommentId { get; set; }
 
@@ -25,5 +26,6 @@ namespace dotNetLabs.Server.Models.Models
 
         [ForeignKey(nameof(Video))]
         public string VideoId { get; set; }
+
     }
 }

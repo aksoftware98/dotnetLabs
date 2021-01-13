@@ -12,6 +12,7 @@ namespace dotNetLabs.Repositories
         IUsersRepository Users { get; }
         IPlaylistsRepository Playlists { get; }
         IVideosRepository Videos { get; }
+        ICommentsRepository Comments { get; }
         Task CommitChangesAsync(string userId);
     }
 

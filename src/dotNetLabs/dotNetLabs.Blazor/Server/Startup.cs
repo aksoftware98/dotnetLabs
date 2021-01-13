@@ -117,6 +117,7 @@ namespace dotNetLabs.Server
             services.AddScoped<IUsersService, UsersService>(); 
             services.AddScoped<IPlaylistService, PlaylistsService>(); 
             services.AddScoped<IVideosService, VideosService>(); 
+            services.AddScoped<ICommentsService, CommentsService>(); 
 
             services.AddScoped<IFilesStorageService, LocalFilesStorageService>();
             services.AddSingleton(provider => new MapperConfiguration(config =>

@@ -57,6 +57,18 @@ namespace dotNetLabs.Repositories
             }
         }
 
+        private ICommentsRepository _comments;
+        public ICommentsRepository Comments
+        {
+            get
+            {
+                if (_comments == null)
+                    _comments = new CommentsRepository(_db);
+
+                return _comments;
+            }
+        }
+
         public async Task CommitChangesAsync(string userId)
         {
             await _db.SaveChangesAsync(userId);
