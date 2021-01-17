@@ -1,5 +1,6 @@
 ﻿using dotNetLabs.Server.Services;
 using dotNetLabs.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace dotNetLabs.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CommentsController : ControllerBase
     {
 
@@ -20,6 +22,8 @@ namespace dotNetLabs.Server.Controllers
             _commentsService = commentsService; 
         }
 
+        [ProducesResponseType(200, Type = typeof(OperationResponse<CommentDetail>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<CommentDetail>))]
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CommentDetail model)
         {
@@ -30,6 +34,8 @@ namespace dotNetLabs.Server.Controllers
             return BadRequest(result);
         }
 
+        [ProducesResponseType(200, Type = typeof(OperationResponse<CommentDetail>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<CommentDetail>))]
         [HttpPut("Edit")]
         public async Task<IActionResult> Edit([FromBody] CommentDetail model)
         {
@@ -40,6 +46,8 @@ namespace dotNetLabs.Server.Controllers
             return BadRequest(result);
         }
 
+        [ProducesResponseType(200, Type = typeof(OperationResponse<CommentDetail>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<CommentDetail>))]
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(string id)
         {

@@ -15,7 +15,8 @@ namespace dotNetLabs.Shared
 
         [StringLength(5000)]
         public string Description { get; set; }
-        //public IEnumerable<VideoDetail> Videos { get; set; }
+
+        public IEnumerable<VideoDetail> Videos { get; set; }
 
     }
 }

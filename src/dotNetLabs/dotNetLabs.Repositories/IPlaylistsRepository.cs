@@ -12,7 +12,9 @@ namespace dotNetLabs.Repositories
         Task CreateAsync(Playlist playlist);
         void Remove(Playlist playlist);
         IEnumerable<Playlist> GetAll();
-
+        IEnumerable<Video> GetAllVideosInPlaylist(string id);
+        void RemoveVideoFromPlaylist(PlaylistVideo playlistVideo);
+        Task AddVideoToPlaylistAsync(PlaylistVideo playlistVideo);
         Task<Playlist> GetByIdAsync(string id);
 
     }

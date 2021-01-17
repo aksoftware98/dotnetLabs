@@ -127,6 +127,8 @@ namespace dotNetLabs.Server
 
             //services.AddAutoMapper(typeof(VideoProfile));
 
+            services.AddSwaggerGen(); 
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -154,6 +156,13 @@ namespace dotNetLabs.Server
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(swagger =>
+            {
+                swagger.SwaggerEndpoint("/swagger/v1/swagger.json", "dotNet Labs API");
+            });
 
             app.UseRouting();
 

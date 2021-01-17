@@ -9,13 +9,14 @@ namespace dotNetLabs.Server.Models.Mappers
     public static class PlaylistsMapper
     {
 
-        public static PlaylistDetail ToPlaylistDetail(this Playlist playlist)
+        public static PlaylistDetail ToPlaylistDetail(this Playlist playlist, IEnumerable<VideoDetail> playlistVideos = null,bool includeVideos = false)
         {
             return new PlaylistDetail
             {
                 Id = playlist.Id,
                 Description = playlist.Description,
-                Name = playlist.Name
+                Name = playlist.Name,
+                Videos = includeVideos ? playlistVideos : null
             };
         }
 

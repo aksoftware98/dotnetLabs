@@ -20,6 +20,7 @@ namespace dotNetLabs.Server.Services
         Task<OperationResponse<VideoDetail>> RemoveAsync(string id);
         Task<OperationResponse<VideoDetail>> GetVideoDetailAsync(string videoId); 
         CollectionResponse<VideoDetail> GetAllVideos(string query, int pageNumber = 1, int pageSize = 10);
+       
     }
 
     public class VideosService : IVideosService
@@ -46,6 +47,8 @@ namespace dotNetLabs.Server.Services
             _mapper = mapper;
             _commentsService = commentsService; 
         }
+
+ 
 
         public async Task<OperationResponse<VideoDetail>> CreateAsync(VideoDetail model)
         {

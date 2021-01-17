@@ -12,7 +12,7 @@ namespace dotNetLabs.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class PlaylistsController : ControllerBase
     {
 
@@ -23,6 +23,21 @@ namespace dotNetLabs.Server.Controllers
             _playlistsService = playlistService;
         }
 
+        [ProducesResponseType(200, Type = typeof(OperationResponse<PlaylistDetail>))]
+        [ProducesResponseType(404)]
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            var result = await _playlistsService.GetSinglePlaylistAsync(id);
+            if (result.IsSuccess)
+                return Ok(result);
+
+            return NotFound(); 
+        }
+
+        [ProducesResponseType(200, Type = typeof(CollectionResponse<PlaylistDetail>))]
+        [AllowAnonymous]
         [HttpGet("GetAll")]
         public IActionResult GetAll(int pageNumber, int pageSize)
         {
@@ -30,6 +45,8 @@ namespace dotNetLabs.Server.Controllers
             return Ok(result); 
         }
 
+        [ProducesResponseType(200, Type = typeof(OperationResponse<PlaylistDetail>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<PlaylistDetail>))]
         [HttpPost("Create")]
         public async Task<IActionResult> Create(PlaylistDetail model)
         {
@@ -40,6 +57,9 @@ namespace dotNetLabs.Server.Controllers
             return BadRequest(result);
         }
 
+
+        [ProducesResponseType(200, Type = typeof(OperationResponse<PlaylistDetail>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<PlaylistDetail>))]
         [HttpPut("Update")]
         public async Task<IActionResult> Update(PlaylistDetail model)
         {
@@ -50,6 +70,9 @@ namespace dotNetLabs.Server.Controllers
             return BadRequest(result); 
         }
 
+
+        [ProducesResponseType(200, Type = typeof(OperationResponse<PlaylistDetail>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<PlaylistDetail>))]
         [HttpDelete("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
@@ -58,6 +81,18 @@ namespace dotNetLabs.Server.Controllers
                 return Ok(result);
 
             return BadRequest(result);
+        }
+
+        [ProducesResponseType(200, Type = typeof(OperationResponse<string>))]
+        [ProducesResponseType(400, Type = typeof(OperationResponse<string>))]
+        [HttpPost("AssignOrRemoveVideo")]
+        public async Task<IActionResult> AssignOrRemoveVideo([FromBody]PlaylistVideoRequest model)
+        {
+            var result = await _playlistsService.AssignOrRemoveVideoFromPlaylistAsync(model);
+            if (result.IsSuccess)
+                return Ok(result);
+
+            return BadRequest(result); 
         }
 
     }
