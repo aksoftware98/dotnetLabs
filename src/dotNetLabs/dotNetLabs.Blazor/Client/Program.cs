@@ -1,3 +1,6 @@
+using Blazored.LocalStorage;
+using BlazorFluentUI;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +20,19 @@ namespace dotNetLabs.Blazor
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            // Initailzing the HttpClient 
+            builder.Services.AddHttpClient("dotNetLabs.Api", client =>
+            {
+                client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+            }).AddHttpMessageHandler<AuthorizationMessageHandler>();
+            builder.Services.AddTransient(sp => sp.GetService<IHttpClientFactory>().CreateClient("dotNetLabs.Api"));
+            builder.Services.AddTransient<AuthorizationMessageHandler>();
+
+            builder.Services.AddScoped<AuthenticationStateProvider, LocalAuthenticationStateProvider>(); 
+
+            builder.Services.AddBlazorFluentUI();
+            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddAuthorizationCore(); 
 
             await builder.Build().RunAsync();
         }

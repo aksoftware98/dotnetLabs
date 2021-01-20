@@ -2,10 +2,14 @@
 @using dotNetLabs.Shared
 @inject HttpClient Http
 
+@attribute [Authorize]
+
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
-
+<AuthorizeView>
+    <h2>Welcome @context.User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)</h2>
+</AuthorizeView>
 @if (forecasts == null)
 {
     <p><em>Loading...</em></p>
@@ -36,6 +40,7 @@ else
 }
 
 @code {
+
     private WeatherForecast[] forecasts;
 
     protected override async Task OnInitializedAsync()
