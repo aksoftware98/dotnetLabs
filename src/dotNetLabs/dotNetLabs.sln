@@ -3,21 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetLabs.Server", "dotNetLabs.Blazor\Server\dotNetLabs.Server.csproj", "{EA371403-AD0E-4B2B-A672-82547F8F1EA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNetLabs.Server", "dotNetLabs.Blazor\Server\dotNetLabs.Server.csproj", "{EA371403-AD0E-4B2B-A672-82547F8F1EA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetLabs.Blazor", "dotNetLabs.Blazor\Client\dotNetLabs.Blazor.csproj", "{4AC0625F-8A08-4AF4-B4FB-6ED87C931888}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNetLabs.Blazor", "dotNetLabs.Blazor\Client\dotNetLabs.Blazor.csproj", "{4AC0625F-8A08-4AF4-B4FB-6ED87C931888}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetLabs.Shared", "dotNetLabs.Blazor\Shared\dotNetLabs.Shared.csproj", "{AF557A7C-EC77-437E-8E1C-544FFD368A51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNetLabs.Shared", "dotNetLabs.Blazor\Shared\dotNetLabs.Shared.csproj", "{AF557A7C-EC77-437E-8E1C-544FFD368A51}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{AE28F0B2-E979-44E6-BA34-D93289AF270E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetLabs.Server.Models", "dotNetLabs.Server.Models\dotNetLabs.Server.Models.csproj", "{B37EADB9-57A6-4E62-837F-7AF14260A21F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNetLabs.Server.Models", "dotNetLabs.Server.Models\dotNetLabs.Server.Models.csproj", "{B37EADB9-57A6-4E62-837F-7AF14260A21F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetLabs.Server.Infrastructure", "dotNetLabs.Server.Infrastructure\dotNetLabs.Server.Infrastructure.csproj", "{F7CB5D45-4502-46E0-B034-51F08802EF60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNetLabs.Server.Infrastructure", "dotNetLabs.Server.Infrastructure\dotNetLabs.Server.Infrastructure.csproj", "{F7CB5D45-4502-46E0-B034-51F08802EF60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetLabs.Repositories", "dotNetLabs.Repositories\dotNetLabs.Repositories.csproj", "{CAD9B04C-7175-47A0-968D-14D708E1CA96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNetLabs.Repositories", "dotNetLabs.Repositories\dotNetLabs.Repositories.csproj", "{CAD9B04C-7175-47A0-968D-14D708E1CA96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetLabs.Server.Services", "dotNetLabs.Server.Services\dotNetLabs.Server.Services.csproj", "{66A5A11D-C3F9-48F7-8F15-1596467FC8F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNetLabs.Server.Services", "dotNetLabs.Server.Services\dotNetLabs.Server.Services.csproj", "{66A5A11D-C3F9-48F7-8F15-1596467FC8F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

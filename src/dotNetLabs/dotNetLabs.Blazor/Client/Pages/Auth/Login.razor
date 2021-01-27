@@ -1,0 +1,71 @@
+﻿@page "/auth/login"
+
+@inject HttpClient httpClient
+@inject Blazored.LocalStorage.ILocalStorageService storageService
+@inject AuthenticationStateProvider authStateProvider
+
+<h3>Welcome to doNet Labs</h3>
+<p>Please login with your account</p>
+
+<EditForm Model="model" OnValidSubmit="@LoginUserAsync">
+
+    <div class="textFieldDiv">
+        <BFUTextField Label="Email" @bind-Value="model.Email" />
+    </div>
+    <div class="textFieldDiv">
+        <BFUTextField Label="Password" InputType="InputType.Password" @bind-Value="model.Password" />
+    </div>
+
+    <BFUButtonBase Text="Login" Disabled="isBusy" />
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <BFUMessageBar MessageBarType="MessageBarType.Error" IsMultiline="false">
+            @message
+        </BFUMessageBar>
+    }
+
+    @if (isBusy)
+    {
+        <BFUSpinner Size=@SpinnerSize.Large></BFUSpinner>
+    }
+
+</EditForm>
+
+
+@code {
+
+    private bool isBusy = false;
+    private string message = string.Empty;
+    private LoginRequest model = new LoginRequest();
+
+    private async Task LoginUserAsync()
+    {
+        isBusy = true;
+        try
+        {
+            var response = await httpClient.PostAsJsonAsync<LoginRequest>("api/authentication/login", model);
+            var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            if (response.IsSuccessStatusCode)
+            {
+                await storageService.SetItemAsync<string>("access_token", result.AccessToken);
+
+                await authStateProvider.GetAuthenticationStateAsync();
+
+                // Redirect the user to the home page
+                Console.WriteLine("Loged successfully!");
+            }
+            else
+            {
+                message = result.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            message = ex.Message;
+        }
+        isBusy = false;
+    }
+
+}

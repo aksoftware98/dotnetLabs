@@ -1,36 +1,33 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">dotNetLabs.Blazor</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+﻿
+<BFUStack Horizontal="false" VerticalFill="true" Style="overflow:hidden;">
+    <BFUStackItem Grow="0" VerticalFill="false" Align="Alignment.Center">
+        <div class="top-row">
+            <BFULink Href="/">dotNet Labs V1.0</BFULink>
+        </div>
+    </BFUStackItem>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
-    </ul>
-</div>
+    <BFUStackItem VerticalFill="true" Style="overflow-y:auto;">
+        <BFUNav>
+            <BFUNavLinkGroup Name="dotNet Labs" CollapseByDefault="false">
+                @*<BFUNavLink Name="Basic" Url="" Id="" IconName="ButtonControl" OnClick=@OnLinkClicked />*@
+                <BFUNavLink Name="Videos" Url="buttonsPage" Id="buttonsPage" OnClick=@OnLinkClicked />
+                <BFUNavLink Name="Playlists" Url="checkboxPage" Id="checkboxPage" OnClick=@OnLinkClicked />
+                <BFUNavLink Name="Management" Url="checkboxPage" Id="checkboxPage" OnClick=@OnLinkClicked />
+            </BFUNavLinkGroup>
+        </BFUNav>
+    </BFUStackItem>
+</BFUStack>
 
 @code {
-    private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    [Parameter] 
+    public EventCallback<BFUNavLink> OnLinkClicked { get; set; }
 
-    private void ToggleNavMenu()
+    bool collapseNavMenu = true;
+
+    string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
