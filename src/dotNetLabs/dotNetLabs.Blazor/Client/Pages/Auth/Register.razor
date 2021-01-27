@@ -1,0 +1,80 @@
+﻿@page "/auth/register"
+
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager 
+   
+<BFUStack>
+
+    <h2>Welcome to dotNet Labs</h2>
+    <p>Create your new account by just filling the form</p>
+
+    <EditForm Model="model" OnValidSubmit="RegisterUserAsync">
+
+        <div class="textFieldDiv">
+            <BFUTextField Label="First Name" @bind-Value="model.FirstName" />
+        </div>
+
+        <div class="textFieldDiv">
+            <BFUTextField Label="Last Name" @bind-Value="model.LastName" />
+        </div>
+
+        <div class="textFieldDiv">
+            <BFUTextField Label="Email" @bind-Value="model.Email" />
+        </div>
+
+        <div class="textFieldDiv">
+            <BFUTextField Label="Password" InputType="InputType.Password" @bind-Value="model.Password" />
+        </div>
+
+        <div class="textFieldDiv">
+            <BFUTextField Label="Confirm Password" InputType="InputType.Password" @bind-Value="model.ConfirmPassword" />
+        </div>
+
+        @if (isBusy)
+        {
+            <BFUSpinner Size=@SpinnerSize.Large />
+        }
+
+        <BFUButtonBase Text="Register" Disabled="isBusy" />
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <BFUMessageBar MessageBarType="MessageBarType.Error" IsMultiline="false">
+                @message
+            </BFUMessageBar>
+        }
+
+    </EditForm>
+
+</BFUStack>
+
+@code {
+
+    private bool isBusy = false;
+    private string message = string.Empty;
+    private RegisterRequest model = new RegisterRequest();
+
+    private async Task RegisterUserAsync()
+    {
+        isBusy = true; 
+        try
+        {
+            var response = await httpClient.PostAsJsonAsync("/api/authentication/register", model);
+            var result = await response.Content.ReadFromJsonAsync<OperationResponse<string>>();
+            if(response.IsSuccessStatusCode)
+            {
+                navigationManager.NavigateTo("/auth/login");
+            }
+            else
+            {
+                message = result.Message; 
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            message = "Something went wrong, please try again later";
+        }
+        isBusy = false; 
+    }
+}

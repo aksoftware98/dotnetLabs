@@ -47,5 +47,11 @@ namespace dotNetLabs.Blazor
                 return new AuthenticationState(new ClaimsPrincipal());
             }
         }
+
+        public async Task LogoutAsync()
+        {
+            await _storageService.RemoveItemAsync("access_token");
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal()))); 
+        }
     }
 }

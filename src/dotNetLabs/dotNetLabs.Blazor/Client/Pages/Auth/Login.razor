@@ -3,6 +3,7 @@
 @inject HttpClient httpClient
 @inject Blazored.LocalStorage.ILocalStorageService storageService
 @inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager navigationManager   
 
 <h3>Welcome to doNet Labs</h3>
 <p>Please login with your account</p>
@@ -54,6 +55,7 @@
 
                 // Redirect the user to the home page
                 Console.WriteLine("Loged successfully!");
+                navigationManager.NavigateTo("/");
             }
             else
             {
@@ -66,6 +68,13 @@
             message = ex.Message;
         }
         isBusy = false;
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity.IsAuthenticated)
+            navigationManager.NavigateTo("/"); 
     }
 
 }
