@@ -1,10 +1,13 @@
 ﻿@page "/"
+@inject ILanguageContainerService language 
 
 <h1>Welcome to dotNet Labs</h1>
 
 <BFUStack Horizontal="true" Tokens=@(new BFUStackTokens() { ChildrenGap = new[] { 40.0 } })>
-    <BFUDefaultButton Text="Standard" />
-    <BFUPrimaryButton Text="Primary"  />
+    <BFUDefaultButton Text="English" @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("en-US"))' />
+    <BFUDefaultButton Text="German" @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("de-DE"))' />
+    <BFUDefaultButton Text="French" @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("fr-FR"))' />
+    <BFUDefaultButton Text="Indian" @onclick='() => language.SetLanguage(System.Globalization.CultureInfo.GetCultureInfo("pa-IN"))' />
 </BFUStack>
 
 Welcome to your new app.

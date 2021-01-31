@@ -1,4 +1,5 @@
-﻿
+﻿@inject ILanguageContainerService language
+@inject NavigationManager navigationManager
 <BFUStack Horizontal="false" VerticalFill="true" Style="overflow:hidden;">
     <BFUStackItem Grow="0" VerticalFill="false" Align="Alignment.Center">
         <div class="top-row">
@@ -10,9 +11,9 @@
         <BFUNav>
             <BFUNavLinkGroup Name="dotNet Labs" CollapseByDefault="false">
                 @*<BFUNavLink Name="Basic" Url="" Id="" IconName="ButtonControl" OnClick=@OnLinkClicked />*@
-                <BFUNavLink Name="Videos" Url="buttonsPage" Id="buttonsPage" OnClick=@OnLinkClicked />
-                <BFUNavLink Name="Playlists" Url="checkboxPage" Id="checkboxPage" OnClick=@OnLinkClicked />
-                <BFUNavLink Name="Management" Url="checkboxPage" Id="checkboxPage" OnClick=@OnLinkClicked />
+                <BFUNavLink Name="@language["NavMenu:Videos"]" Url="videos" Id="buttonsPage" />
+                <BFUNavLink Name="@language["NavMenu:Playlists"]" Url="checkboxPage" Id="checkboxPage" OnClick=@OnLinkClicked />
+                <BFUNavLink Name="@language["NavMenu:Management"]" Url="checkboxPage" Id="checkboxPage" OnClick=@OnLinkClicked />
             </BFUNavLinkGroup>
         </BFUNav>
     </BFUStackItem>
@@ -20,7 +21,7 @@
 
 @code {
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<BFUNavLink> OnLinkClicked { get; set; }
 
     bool collapseNavMenu = true;
@@ -30,5 +31,11 @@
     void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override void OnInitialized()
+    {
+        language.InitLocalizedComponent(this);
+        base.OnInitialized();
     }
 }

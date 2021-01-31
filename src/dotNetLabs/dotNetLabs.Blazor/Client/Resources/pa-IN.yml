@@ -1,0 +1,19 @@
+NavMenu:
+  Videos: ਵਿਡੀਓ
+  Playlists: ਪਲੇਅਲਿਸਟ
+  Management: ਪਰਬੰਧ
+Auth:
+  Welcome: ਸਵਾਗਤ ਹੈ
+  Register: ਰਜਿਸਟਰ
+  Login: ਲਾਗਇਨ
+  Email: ਈਮੇਲ
+  Password: ਪਾਸਵਰਡ
+  Logout: ਲਾਗਆਉਟ
+Login:
+  Welcome: ਇਸ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ
+  SubTitle: ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਖਾਤੇ ਨਾਲ ਲੌਗਇਨ ਕਰੋ
+Register:
+  SubTitle: ਕੇਵਲ ਫਾਰਮ ਭਰਕੇ ਆਪਣਾ ਨਵਾਂ ਖਾਤਾ ਬਣਾਓ
+  FirstName: ਪਹਿਲਾ ਨਾਂ
+  LastName: ਆਖਰੀ ਨਾਂ
+  ConfirmPassword: ਪਾਸਵਰਡ ਪੁਸ਼ਟੀ ਕਰੋ

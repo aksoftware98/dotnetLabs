@@ -3,6 +3,7 @@
 
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
+@inject ILanguageContainerService language
 
 <BFUStack Horizontal="true" Style="width:100%;">
     <BFUResponsiveLayout MinWidth="ResponsiveMode.Medium.ToMinCssValue()">
@@ -35,7 +36,7 @@
                         <AuthorizeView>
                             <Authorized>
                                 @{
-                                    string greeting = $"Welcome {context.User.FindFirst(System.Security.Claims.ClaimTypes.GivenName).Value}";
+                                    string greeting = $"{language["Auth:Welcome"]} {context.User.FindFirst(System.Security.Claims.ClaimTypes.GivenName).Value}";
                                 }
                                 <BFUPrimaryButton Text="@greeting"
                                                   Split="true"
@@ -43,7 +44,7 @@
                                                   OnClick=@(() => OnClickHandler("Logout")) />
                             </Authorized>
                             <NotAuthorized>
-                                <BFUPrimaryButton Text="Register"
+                                <BFUPrimaryButton Text="@language["Auth:Register"]"
                                                   Split="true"
                                                   MenuItems="AccountMenuProperties"
                                                   OnClick=@(() => navigationManager.NavigateTo("/auth/register")) />
@@ -275,7 +276,7 @@
             new BFUContextualMenuItem()
             {
                 Key = "logout",
-                Text = "Logout",
+                Text = language["Auth:Logout"],
                 IconName="User",
                 OnClick = async (e) => await LogoutAsync(e)
             },
@@ -286,10 +287,12 @@
             new BFUContextualMenuItem
             {
                 Key = "login",
-                Text = "Login",
+                Text = language["Auth:Login"],
                 OnClick = (e) => navigationManager.NavigateTo("/auth/login")
             }
         };
+
+        language.InitLocalizedComponent(this); 
 
     }
 

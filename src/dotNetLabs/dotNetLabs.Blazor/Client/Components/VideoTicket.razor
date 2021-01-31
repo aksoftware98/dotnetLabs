@@ -1,0 +1,21 @@
+﻿
+<div class="video-card ms-depth-4" @onclick="TicketClicked">
+    <img src="@Video.ThumpUrl" />
+    <div class="card-content">
+        <h4>@Video.Title</h4>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public VideoDetail Video { get; set; }
+
+    [Parameter]
+    public EventCallback<VideoDetail> OnTicketClicked { get; set; }
+
+    private async Task TicketClicked()
+    {
+        await OnTicketClicked.InvokeAsync(Video);
+    }
+}

@@ -3,21 +3,22 @@
 @inject HttpClient httpClient
 @inject Blazored.LocalStorage.ILocalStorageService storageService
 @inject AuthenticationStateProvider authStateProvider
-@inject NavigationManager navigationManager   
+@inject NavigationManager navigationManager
+@inject ILanguageContainerService language
 
-<h3>Welcome to doNet Labs</h3>
-<p>Please login with your account</p>
+<h3>@language["Login:Welcome"] doNet Labs</h3>
+<p>@language["Login:SubTitle"]</p>
 
 <EditForm Model="model" OnValidSubmit="@LoginUserAsync">
 
     <div class="textFieldDiv">
-        <BFUTextField Label="Email" @bind-Value="model.Email" />
+        <BFUTextField Label="@language["Auth:Email"]" @bind-Value="model.Email" />
     </div>
     <div class="textFieldDiv">
-        <BFUTextField Label="Password" InputType="InputType.Password" @bind-Value="model.Password" />
+        <BFUTextField Label="@language["Auth:Password"]" InputType="InputType.Password" @bind-Value="model.Password" />
     </div>
 
-    <BFUButtonBase Text="Login" Disabled="isBusy" />
+    <BFUButtonBase Text="@language["Auth:Login"]" Disabled="isBusy" />
 
     @if (!string.IsNullOrWhiteSpace(message))
     {
@@ -74,7 +75,7 @@
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity.IsAuthenticated)
-            navigationManager.NavigateTo("/"); 
+            navigationManager.NavigateTo("/");
     }
 
 }

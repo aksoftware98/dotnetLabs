@@ -1,0 +1,18 @@
+﻿.video-card {
+    width: 100%;
+    margin: 5px;  
+    cursor: pointer;
+}
+
+.video-card:hover {
+    background-color: lightblue;
+}
+
+.video-card img {
+    width: 100%; 
+}
+
+.video-card .card-content {
+    padding: 0px 0px 1px 7px;
+}
+

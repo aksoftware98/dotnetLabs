@@ -1,0 +1,67 @@
+﻿@page "/Videos" 
+@inject ILanguageContainerService language 
+@inject NavigationManager navigationManager 
+@inject HttpClient httpClient 
+ 
+<h3>@language["Videos:Title"]</h3>
+
+@if(isBusy)
+{
+    <BFUSpinner Size="SpinnerSize.Large" /> 
+}
+
+<div class="ms-Grid" dir="ltr">
+    <div class="ms-Grid-row">
+        @if (videos != null)
+        {
+            @foreach (var video in videos)
+            {
+                <div class="ms-Grid-col ms-sm12 ms-md6 ms-lg3">
+                    <VideoTicket Video="@video" OnTicketClicked="OnVideoClicked"/>
+                </div>
+            }
+        }
+
+    </div>
+</div>
+
+<!-- Pagination -->
+
+@code {
+
+    private bool isBusy = false;
+    private IEnumerable<VideoDetail> videos = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchVideosAsync();
+    }
+
+    private async Task FetchVideosAsync()
+    {
+        isBusy = true;
+        try
+        {
+            var response = await httpClient.GetFromJsonAsync<CollectionResponse<VideoDetail>>("/api/videos/getall");
+            if (response.IsSuccess)
+            {
+                videos = response.Records;
+            }
+            else
+            {
+                // TODO: Show an error message 
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+        }
+        isBusy = false;
+    }
+
+    private void OnVideoClicked(VideoDetail video)
+    {
+        navigationManager.NavigateTo($"/videos/details/{video.Id}");
+    }
+}

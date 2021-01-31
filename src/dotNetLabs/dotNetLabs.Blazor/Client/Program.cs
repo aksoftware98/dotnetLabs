@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using AKSoftware.Localization.MultiLanguages;
+using System.Reflection;
 
 namespace dotNetLabs.Blazor
 {
@@ -32,7 +34,8 @@ namespace dotNetLabs.Blazor
 
             builder.Services.AddBlazorFluentUI();
             builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddAuthorizationCore(); 
+            builder.Services.AddAuthorizationCore();
+            builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly()); 
 
             await builder.Build().RunAsync();
         }

@@ -1,0 +1,19 @@
+NavMenu:
+  Videos: Vidéos
+  Playlists: Playlists
+  Management: Managment
+Auth:
+  Welcome: Bienvenue
+  Register: Registre
+  Login: connectez-vous
+  Email: Messagerie électronique
+  Password: mot de passe
+  Logout: Déconnexion
+Login:
+  Welcome: Bienvenue à
+  SubTitle: S’il vous plaît vous connecter avec votre compte
+Register:
+  SubTitle: Créez votre nouveau compte en remplissant simplement le formulaire
+  FirstName: Prénom
+  LastName: Nom de famille
+  ConfirmPassword: Confirmer le mot de passe

@@ -1,0 +1,25 @@
+﻿NavMenu:
+ Videos: Videos 
+ Playlists: Playlists 
+ Management: Management 
+
+Auth: 
+ Welcome: Welcome 
+ Register: Register
+ Login: Login 
+ Email: Email
+ Password: Password
+ Logout: Logout 
+
+Login: 
+ Welcome: Welcome to
+ SubTitle: Please login with your account
+
+Register: 
+ SubTitle: Create your new account by just filling the form
+ FirstName: First Name
+ LastName: Last Name
+ ConfirmPassword: Confirm Password
+
+ Videos:
+  Title: Our Videos

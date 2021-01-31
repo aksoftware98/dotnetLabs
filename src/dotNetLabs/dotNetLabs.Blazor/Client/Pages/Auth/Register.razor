@@ -2,32 +2,33 @@
 
 @inject HttpClient httpClient
 @inject NavigationManager navigationManager 
-   
+@inject ILanguageContainerService language 
+ 
 <BFUStack>
 
-    <h2>Welcome to dotNet Labs</h2>
-    <p>Create your new account by just filling the form</p>
+    <h2>@language["Login:Welcome"] dotNet Labs</h2>
+    <p>@language["Register:SubTitle"]</p>
 
     <EditForm Model="model" OnValidSubmit="RegisterUserAsync">
 
         <div class="textFieldDiv">
-            <BFUTextField Label="First Name" @bind-Value="model.FirstName" />
+            <BFUTextField Label="@language["Register:FirstName"]" @bind-Value="model.FirstName" />
         </div>
 
         <div class="textFieldDiv">
-            <BFUTextField Label="Last Name" @bind-Value="model.LastName" />
+            <BFUTextField Label="@language["Register:Password"]" @bind-Value="model.LastName" />
         </div>
 
         <div class="textFieldDiv">
-            <BFUTextField Label="Email" @bind-Value="model.Email" />
+            <BFUTextField Label="@language["Auth:Email"]" @bind-Value="model.Email" />
         </div>
 
         <div class="textFieldDiv">
-            <BFUTextField Label="Password" InputType="InputType.Password" @bind-Value="model.Password" />
+            <BFUTextField Label="@language["Auth:Password"]" InputType="InputType.Password" @bind-Value="model.Password" />
         </div>
 
         <div class="textFieldDiv">
-            <BFUTextField Label="Confirm Password" InputType="InputType.Password" @bind-Value="model.ConfirmPassword" />
+            <BFUTextField Label="@language["Register:ConfirmPassword"]" InputType="InputType.Password" @bind-Value="model.ConfirmPassword" />
         </div>
 
         @if (isBusy)
@@ -35,7 +36,7 @@
             <BFUSpinner Size=@SpinnerSize.Large />
         }
 
-        <BFUButtonBase Text="Register" Disabled="isBusy" />
+        <BFUButtonBase Text="@language["Auth:Register"]" Disabled="isBusy" />
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
