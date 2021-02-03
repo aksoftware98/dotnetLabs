@@ -1,0 +1,72 @@
+﻿@page "/playlists"
+
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager 
+  
+<h3>Playlists</h3>
+
+<BFUStack Horizontal="true">
+    <BFUStackItem Style="width:30%">
+        <h2>Playlists</h2>
+        <PlaylistsCollection OnSelectPlaylist="OnSelectPlaylistAsync" />
+    </BFUStackItem>
+
+    <BFUStackItem Style="width:70%">
+        <h2>Videos</h2>
+        @if (isBusy)
+        {
+            <BFUSpinner Size="SpinnerSize.Large" />
+        }
+
+        <div class="ms-Grid">
+            <div class="ms-Grid" dir="ltr">
+                <div class="ms-Grid-row">
+                    @if (videos != null)
+                    {
+                        @foreach (var video in videos)
+                        {
+                            <div class="ms-Grid-col ms-sm12 ms-md6 ms-lg3">
+                                <VideoTicket Video="@video" OnTicketClicked='() => navigationManager.NavigateTo($"/videos/details/{video.Id}")' />
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </BFUStackItem>
+</BFUStack>
+
+
+@code {
+    private bool isBusy = false;
+    private IEnumerable<VideoDetail> videos = null;
+
+    private async Task FetchPlaylistVideosAsync(string selectedPlaylistId)
+    {
+        isBusy = true;
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<OperationResponse<PlaylistDetail>>($"/api/playlists/{selectedPlaylistId}");
+            if(result.IsSuccess)
+            {
+                videos = result.Data.Videos;
+            }
+            else
+            {
+                // TODO: Show an error 
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message); 
+        }
+        isBusy = false;
+    }
+
+    private async Task OnSelectPlaylistAsync(PlaylistDetail playlist)
+    {
+        // TODO: Fetch the video of the selected playlist
+        await FetchPlaylistVideosAsync(playlist.Id);
+    }
+
+}

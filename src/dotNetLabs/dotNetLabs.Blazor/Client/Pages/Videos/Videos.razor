@@ -20,8 +20,20 @@
                     <VideoTicket Video="@video" OnTicketClicked="OnVideoClicked"/>
                 </div>
             }
-        }
 
+        }
+    </div>
+    <div class="ms-Grid-row">
+        <div class="ms-Grid-col ms-sm4 ms-smPush4">
+            @if(isMoreVideosAvailable)
+            {
+                <BFUButtonBase Text="Load More" @onclick="LoadMoreVideosAsync" />
+            }
+            else if(!isBusy)
+            {
+                <p>All videos retrieved</p>
+            }
+        </div>
     </div>
 </div>
 
@@ -30,26 +42,46 @@
 @code {
 
     private bool isBusy = false;
-    private IEnumerable<VideoDetail> videos = null;
+    private List<VideoDetail> videos = null;
+    private int currentPageNumber = 1;
+    private int totalPagesCount = 1;
+    private bool isMoreVideosAvailable = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchVideosAsync();
+        videos = (await FetchVideosAsync()).ToList();
     }
 
-    private async Task FetchVideosAsync()
+
+    private async Task LoadMoreVideosAsync()
+    {
+        currentPageNumber++;
+        var result = await FetchVideosAsync();
+        if (result != null)
+            videos.AddRange(result);
+    }
+
+    private async Task<IEnumerable<VideoDetail>> FetchVideosAsync()
     {
         isBusy = true;
         try
         {
-            var response = await httpClient.GetFromJsonAsync<CollectionResponse<VideoDetail>>("/api/videos/getall");
+            var response = await httpClient.GetFromJsonAsync<CollectionResponse<VideoDetail>>($"/api/videos/getall?pageNumber={currentPageNumber}&pageSize=12");
             if (response.IsSuccess)
             {
-                videos = response.Records;
+                currentPageNumber = response.PageNumber.Value;
+                totalPagesCount = response.PagesCount.Value;
+                if ((currentPageNumber + 1) <= totalPagesCount)
+                    isMoreVideosAvailable = true;
+                else
+                    isMoreVideosAvailable = false;
+                isBusy = false;
+                return response.Records;
             }
             else
             {
                 // TODO: Show an error message 
+                return null;
             }
         }
         catch (Exception ex)
@@ -58,6 +90,7 @@
 
         }
         isBusy = false;
+        return null;
     }
 
     private void OnVideoClicked(VideoDetail video)

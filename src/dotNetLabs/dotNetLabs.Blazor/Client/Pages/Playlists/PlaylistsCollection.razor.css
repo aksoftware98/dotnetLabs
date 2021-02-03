@@ -1,0 +1,21 @@
+﻿.items-collection {
+    width: 100%;
+    margin: 5px;
+    border: 1px solid gray;
+}
+
+    .items-collection .item {
+        padding: 5px;
+        margin: 3px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .items-collection .item:hover {
+            background-color: #d2d0ce;
+        }
+
+    .items-collection .selected {
+        background-color: #004e8c;
+        color: white;
+    }

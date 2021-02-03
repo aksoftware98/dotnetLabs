@@ -1,0 +1,99 @@
+﻿
+@inject HttpClient httpClient 
+  
+
+
+<div class="items-collection">
+    @if(playlists != null)
+    {
+        foreach (var item in playlists)
+        {
+            <div class="item ms-depth-8 @(selectedPlaylist == item ? "selected" : "")" @onclick=" async () => await SelectPlaylistAsync(item)">
+                <h3>@item.Name</h3>
+                <p>@item.Description</p>
+            </div>
+        }
+    }
+
+    @if(isMorePlaylistsAvailable)
+    {
+        <BFUButtonBase Text="Load More" @onclick="LoadMorePlaylistsAsync" />
+    }
+    else if(!isBusy)
+    {
+       <p>All playlsits retrieved</p>
+    }
+
+    @if(isBusy)
+    {
+        <BFUSpinner Size="SpinnerSize.Large"/>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<PlaylistDetail> OnSelectPlaylist { get; set; }
+
+    private bool isBusy = false;
+    private List<PlaylistDetail> playlists = null;
+    private int currentPageNumber = 1;
+    private int totalPagesCount = 1;
+    private bool isMorePlaylistsAvailable = false;
+    private PlaylistDetail selectedPlaylist = null;
+
+    private async Task SelectPlaylistAsync(PlaylistDetail playlist)
+    {
+        selectedPlaylist = playlist;
+        await OnSelectPlaylist.InvokeAsync(selectedPlaylist);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        playlists = (await FetchPlaylistsAsync()).ToList();
+    }
+
+
+    private async Task LoadMorePlaylistsAsync()
+    {
+        currentPageNumber++;
+        var result = await FetchPlaylistsAsync();
+        if (result != null)
+            playlists.AddRange(result);
+    }
+
+    private async Task<IEnumerable<PlaylistDetail>> FetchPlaylistsAsync()
+    {
+        isBusy = true;
+        try
+        {
+            var response = await httpClient.GetFromJsonAsync<CollectionResponse<PlaylistDetail>>($"/api/playlists/getall?pageNumber={currentPageNumber}&pageSize=12");
+            if (response.IsSuccess)
+            {
+                currentPageNumber = response.PageNumber.Value;
+                totalPagesCount = response.PagesCount.Value;
+                if ((currentPageNumber + 1) <= totalPagesCount)
+                    isMorePlaylistsAvailable = true;
+                else
+                    isMorePlaylistsAvailable = false;
+                isBusy = false;
+                return response.Records;
+            }
+            else
+            {
+                // TODO: Show an error message 
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+        }
+        isBusy = false;
+        return null;
+    }
+
+
+
+}
