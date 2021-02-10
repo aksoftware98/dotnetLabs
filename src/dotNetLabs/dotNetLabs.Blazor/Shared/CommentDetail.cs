@@ -20,5 +20,7 @@ namespace dotNetLabs.Shared
         public string VideoId { get; set; }
         public string ParentCommentId { get; set; }
 
+        public string UserId { get; set; }
+
     }
 }

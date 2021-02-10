@@ -62,7 +62,9 @@ namespace dotNetLabs.Server.Services
 
             await _unitOfWork.Comments.CreateAsync(newComment);
             await _unitOfWork.CommitChangesAsync(_identity.UserId);
-            model.Id = newComment.Id; 
+            model.Id = newComment.Id;
+            model.Username = _identity.FullName;
+
             return new OperationResponse<CommentDetail>
             {
                 IsSuccess = true,

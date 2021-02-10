@@ -21,6 +21,7 @@ namespace dotNetLabs.Server.Models.Mappers
                 Username = $"{comment.CreatedByUser.FirstName} {comment.CreatedByUser.LastName}",
                 VideoId = comment.VideoId,
                 Replys = comment.Replys?.Select(c => c.ToCommentDetail()),
+                UserId = comment.CreatedByUserId,
             };
         }
     }

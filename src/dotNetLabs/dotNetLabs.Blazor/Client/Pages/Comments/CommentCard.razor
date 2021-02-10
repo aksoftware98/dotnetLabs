@@ -1,0 +1,82 @@
+﻿@inject AuthenticationStateProvider authStateProvider
+@inject HttpClient httpClient
+
+<div class="comment-card ms-depth-8">
+    <h4>@CommentDetail.Username</h4>
+    <p>@CommentDetail.Content</p>
+    <p>Add a reply</p>
+    <AuthorizeView>
+        <Authorized>
+            <CommentForm VideoId="@CommentDetail.VideoId"
+                         OnCommentCreated="@OnCommentCreated"
+                         ParentCommentId="@CommentDetail.Id" />
+        </Authorized>
+    </AuthorizeView>
+
+    @if (CommentDetail.UserId == currentUserId)
+    {
+        <BFUButtonBase Text="Remove" @onclick="async () => await RemoveCommentAsync(CommentDetail, false)" />
+    }
+</div>
+@if (replys != null && replys.Any())
+{
+    foreach (var reply in replys)
+    {
+        <div class="comment-card ms-depth-8 reply-comment">
+            <h4>@reply.Username</h4>
+            <p>@reply.Content</p>
+
+            @if (CommentDetail.UserId == currentUserId)
+            {
+                <BFUButtonBase Text="Remove" @onclick="async () => await RemoveCommentAsync(reply, true)" />
+            }
+        </div>
+    }
+}
+
+
+<!-- Reply -->
+
+@code {
+    [Parameter]
+    public CommentDetail CommentDetail { get; set; }
+
+    [Parameter]
+    public bool IsReply { get; set; }
+
+    [Parameter]
+    public EventCallback<CommentDetail> OnCommentDeleted { get; set; }
+
+    private List<CommentDetail> replys { get; set; }
+    private string currentUserId { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        replys = CommentDetail?.Replys?.ToList() ?? new List<CommentDetail>();
+        var user = await authStateProvider.GetAuthenticationStateAsync();
+        currentUserId = user.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+
+        base.OnInitialized();
+    }
+
+    private void OnCommentCreated(CommentDetail comment)
+    {
+        replys.Add(comment);
+    }
+
+    private async Task RemoveCommentAsync(CommentDetail commentDetail, bool isReply)
+    {
+        var result = await httpClient.DeleteAsync($"api/comments/delete/{commentDetail.Id}");
+        if (result.IsSuccessStatusCode)
+        {
+            if (isReply)
+            {
+                replys.Remove(commentDetail);
+            }
+            else
+            {
+                await OnCommentDeleted.InvokeAsync(commentDetail);
+            }
+        }
+    }
+}

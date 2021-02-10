@@ -1,0 +1,85 @@
+﻿@page "/videos/details/{id}"
+
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+
+<h3>Video</h3>
+
+@if (isBusy)
+{
+    <BFUSpinner Size="SpinnerSize.Large" />
+}
+else if (videoDetail != null)
+{
+<BFUStack Horizontal="true">
+    <BFUStackItem Style="width:60%">
+        <BFUStack>
+            <h3>@videoDetail.Title</h3>
+            <hr />
+            <!-- Video Frame -->
+            <iframe style="width:95%"
+                    height="500"
+                    src="@videoDetail.VideoUrl"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+            <hr />
+            <ul>
+                <li>@videoDetail.Description</li>
+                <li>@videoDetail.Category</li>
+                <li>@videoDetail.PublishingDate</li>
+            </ul>
+
+            
+        </BFUStack>
+    </BFUStackItem>
+
+        <BFUStackItem Style="width:40%">
+            <dotNetLabs.Blazor.Pages.Comments.Comments VideoId="@Id"
+                                                       CommentsList="commentsList" />
+        </BFUStackItem>
+    </BFUStack>
+   
+}
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private bool isBusy = false;
+    private VideoDetail videoDetail = null;
+
+    private List<CommentDetail> commentsList => videoDetail?.Comments?.ToList();
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            navigationManager.NavigateTo("/videos");
+        else
+            await FetchVideoAsync(Id);
+    }
+
+    private async Task FetchVideoAsync(string id)
+    {
+        isBusy = true;
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<OperationResponse<VideoDetail>>($"/api/videos/{id}");
+            if (result.IsSuccess)
+            {
+                videoDetail = result.Data;
+                Console.WriteLine(videoDetail.Comments.Count());
+            }
+            else
+            {
+                // TODO: Show an error message
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        isBusy = false;
+    }
+}

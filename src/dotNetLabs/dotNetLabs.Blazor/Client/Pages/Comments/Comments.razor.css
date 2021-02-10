@@ -1,0 +1,7 @@
+﻿.comments-list {
+    border: 1px solid gray;
+    padding: 2px;
+    margin: 2px;
+    overflow-y: scroll;
+    max-height: 700px;
+}

@@ -21,5 +21,9 @@ Register:
  LastName: Last Name
  ConfirmPassword: Confirm Password
 
- Videos:
-  Title: Our Videos
+Videos:
+ Title: Our Videos
+
+Comments:
+ Comments: Comments 
+ Content: Content

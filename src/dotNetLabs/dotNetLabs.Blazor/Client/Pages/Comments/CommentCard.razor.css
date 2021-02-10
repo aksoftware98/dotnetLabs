@@ -1,0 +1,21 @@
+﻿.comment-card {
+    border: 1px solid gray; 
+    padding-left: 5px; 
+    margin: 2px; 
+
+}
+
+.comment-card h4 {
+    margin-bottom: -5px; 
+}
+
+.comment-card p {
+    margin-bottom: 5px; 
+}
+
+.reply-comment {
+    border-left: 2px solid #0078d4;
+    margin-left: 10px;
+}
+
+

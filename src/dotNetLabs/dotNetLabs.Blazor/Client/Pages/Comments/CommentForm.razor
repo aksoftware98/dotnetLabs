@@ -1,0 +1,115 @@
+﻿
+@inject HttpClient httpClient
+@inject ILanguageContainerService language
+
+
+<div class="comment-form">
+
+    <EditForm Model="model" OnValidSubmit="SubmitCommentAsync">
+        <div class="textFieldDiv">
+            <BFUTextField Label="@language["Comments:Content"]" @bind-Value="model.Content" />
+        </div>
+
+        <BFUButtonBase Text="@language["Comments:Submit"]" Disabled="isBusy" />
+    </EditForm>
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p>@message</p>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public CommentDetail CommentDetail { get; set; }
+
+    [Parameter]
+    public string VideoId { get; set; }
+
+    [Parameter]
+    public string ParentCommentId { get; set; }
+
+    [Parameter]
+    public EventCallback<CommentDetail> OnCommentCreated { get; set; }
+    [Parameter]
+    public EventCallback<CommentDetail> OnCommentEdit { get; set; }
+
+    private bool isBusy = false;
+    private CommentDetail model = new CommentDetail();
+    private bool isEdit => CommentDetail != null;
+    private string message = string.Empty;
+
+    private CommentDetail InitializeModel()
+    {
+        if (CommentDetail != null)
+            model = CommentDetail;
+        else
+            model = new CommentDetail
+            {
+                VideoId = VideoId,
+                ParentCommentId = ParentCommentId
+            };
+
+        return model;
+    }
+
+    protected override void OnParametersSet()
+    {
+        model = InitializeModel();
+    }
+
+    private async Task SubmitCommentAsync()
+    {
+        isBusy = true;
+        try
+        {
+            if (isEdit)
+            {
+                await EditCommentAsync();
+            }
+            else
+            {
+                await PostCommentAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            // Show error
+        }
+        isBusy = false;
+    }
+
+    private async Task PostCommentAsync()
+    {
+        var result = await httpClient.PostAsJsonAsync("api/comments/create", model);
+        var content = await result.Content.ReadFromJsonAsync<OperationResponse<CommentDetail>>();
+        if (result.IsSuccessStatusCode)
+        {
+            // Call event
+            await OnCommentCreated.InvokeAsync(content.Data);
+            model = InitializeModel();
+        }
+        else
+        {
+            message = content.Message;
+        }
+    }
+
+    private async Task EditCommentAsync()
+    {
+        var result = await httpClient.PostAsJsonAsync("api/comments/edit", model);
+        var content = await result.Content.ReadFromJsonAsync<OperationResponse<CommentDetail>>();
+        if (result.IsSuccessStatusCode)
+        {
+            // Call event
+            await OnCommentEdit.InvokeAsync(content.Data);
+        }
+        else
+        {
+            message = content.Message;
+        }
+    }
+
+}

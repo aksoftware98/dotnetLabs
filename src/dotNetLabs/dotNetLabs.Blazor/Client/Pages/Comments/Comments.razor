@@ -1,0 +1,59 @@
+﻿
+@inject HttpClient httpClient
+@inject ILanguageContainerService language
+
+<h3>@language["Comments:Comments"]</h3>
+
+<AuthorizeView>
+    <Authorized>
+        <CommentForm VideoId="@VideoId"
+                     OnCommentCreated="@OnCommentCreated" />
+    </Authorized>
+    <NotAuthorized>
+        <p>Please login to comment</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+<div class="comments-list">
+    @if (CommentsList != null)
+    {
+        @foreach (var item in CommentsList)
+        {
+            <dotNetLabs.Blazor.Pages.Comments.CommentCard CommentDetail="item" 
+                                                          OnCommentDeleted="OnCommentDeleted"/>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<CommentDetail> CommentsList { get; set; }
+
+    [Parameter]
+    public string VideoId { get; set; }
+
+    [Parameter]
+    public EventCallback<CommentDetail> OnCommentSubmited { get; set; }
+
+    private bool isBusy = false;
+    private CommentDetail model = new CommentDetail();
+
+    protected override void OnInitialized()
+    {
+        model.VideoId = VideoId;
+    }
+
+    private void OnCommentCreated(CommentDetail comment)
+    {
+        CommentsList?.Add(comment);
+    }
+
+    private void OnCommentDeleted(CommentDetail comment)
+    {
+        var existingComment = CommentsList.SingleOrDefault(c => c.Id == comment.Id);
+        if (existingComment != null)
+            CommentsList.Remove(existingComment);
+    }
+
+}
