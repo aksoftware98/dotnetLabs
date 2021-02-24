@@ -1,0 +1,149 @@
+﻿
+@page "/videos/create"
+
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+@inject ILanguageContainerService language
+
+@using System.IO
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>@language["Videos:Create"]</h3>
+
+<EditForm Model="model" OnValidSubmit="@AddVideoAsync">
+
+    <div class="textFieldDiv">
+        <BFUTextField Label="@language["Videos:Name"]" @bind-Value="model.Title" />
+    </div>
+    <div class="textFieldDiv">
+        <BFUTextField Multiline="true" Label="@language["Videos:Description"]" @bind-Value="model.Description" />
+    </div>
+    <div class="textFieldDiv">
+        <BFUTextField Label="@language["Videos:VideoURL"]" @bind-Value="model.VideoUrl" />
+    </div>
+    <div class="textFieldDiv">
+        <label>@language["Videos:ThumbImage"]</label>
+        <InputFile OnChange="OnSelectFileAsync" />
+    </div>
+    <div class="textFieldDiv">
+        <BFUTextField Label="@language["Videos:Tags"]" @bind-Value="model.TagsAsString" />
+    </div>
+
+    <div class="textFieldDiv">
+        <label>@language["Videos:Category"]</label>
+        <select style="width:300px" @onchange="OnSelectCategory">
+            <option value="Education" selected>Education</option>
+            <option value="Sport">Sport</option>
+            <option value="Space">Space</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Music">Music</option>
+        </select>
+    </div>
+    <BFUButtonBase Text="@language["Videos:Submit"]" Disabled="isBusy" />
+
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <BFUMessageBar MessageBarType="MessageBarType.Error" IsMultiline="false">
+            @message
+        </BFUMessageBar>
+    }
+
+    @if (isBusy)
+    {
+        <BFUSpinner Size=@SpinnerSize.Large></BFUSpinner>
+    }
+
+</EditForm>
+
+
+@code {
+
+    private bool isBusy = false;
+    private VideoDetail model = new VideoDetail();
+    private string message = string.Empty;
+
+    private async Task AddVideoAsync()
+    {
+        if (msStream == null)
+        {
+            message = language["Videos:ThumbIsRequired"];
+            return;
+        }
+
+        var content = new MultipartFormDataContent();
+        content.Add(new StringContent(model.Title), "Title");
+        if (!string.IsNullOrEmpty(model.Description))
+            content.Add(new StringContent(model.Description), "Description");
+        content.Add(new StringContent(model.Category.ToString()), "Category");
+        content.Add(new StringContent(model.VideoUrl), "VideoUrl");
+        var tags = model.TagsAsString.Split(',');
+        foreach (var tag in tags)
+        {
+            content.Add(new StringContent(tag), "Tags");
+        }
+        content.Add(new StreamContent(msStream), "ThumpFile", fileName);
+
+        isBusy = true;
+        try
+        {
+            var response = await httpClient.PostAsync("/api/videos/create", content);
+            var responseContent = await response.Content.ReadFromJsonAsync<OperationResponse<VideoDetail>>();
+            Console.WriteLine(responseContent.Message);
+            if (response.IsSuccessStatusCode)
+            {
+                navigationManager.NavigateTo("/videos");
+            }
+            else
+            {
+                message = responseContent.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            message = ex.Message;
+        }
+        isBusy = false;
+
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    #region Read File
+    MemoryStream msStream = null;
+    string fileName = string.Empty;
+
+    private async Task OnSelectFileAsync(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > 0)
+        {
+            string extension = System.IO.Path.GetExtension(e.File.Name);
+            var allowedExtensions = new[] { ".jpg", ".png" };
+            if (!allowedExtensions.Contains(extension))
+            {
+                message = language["Videos:UploadValidImageFile"];
+                return;
+            }
+            if (e.File.Size > 500000)
+            {
+                message = language["Videos:UploadedFileShouldBeSmall"];
+                return;
+            }
+            using (var stream = e.File.OpenReadStream())
+            {
+                msStream = new MemoryStream();
+                await stream.CopyToAsync(msStream);
+                msStream.Position = 0;
+            }
+            fileName = e.File.Name;
+        }
+    }
+    #endregion
+    private void OnSelectCategory(ChangeEventArgs e)
+    {
+        model.Category = Enum.Parse<Category>(e.Value.ToString());
+    }
+}

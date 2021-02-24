@@ -11,35 +11,46 @@
 }
 else if (videoDetail != null)
 {
-<BFUStack Horizontal="true">
-    <BFUStackItem Style="width:60%">
-        <BFUStack>
-            <h3>@videoDetail.Title</h3>
-            <hr />
-            <!-- Video Frame -->
-            <iframe style="width:95%"
-                    height="500"
-                    src="@videoDetail.VideoUrl"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen></iframe>
-            <hr />
-            <ul>
-                <li>@videoDetail.Description</li>
-                <li>@videoDetail.Category</li>
-                <li>@videoDetail.PublishingDate</li>
-            </ul>
+    <BFUStack Horizontal="true">
+        <BFUStackItem Style="width:60%">
+            <BFUStack>
+                <h3>@videoDetail.Title</h3>
 
-            
-        </BFUStack>
-    </BFUStackItem>
+                <AuthorizeView>
+                    @if (context.User.IsInRole("Admin"))
+                    {
+                        <BFUStack Horizontal="true" Tokens=@(new BFUStackTokens() { ChildrenGap = new[] { 40.0 } })>
+                            <BFUPrimaryButton Text="Delete" @onclick="async () => await DeleteVideoAsync(videoDetail.Id)" />
+                            <BFUButtonBase Text="Edit" @onclick='() => navigationManager.NavigateTo($"/videos/edit/{videoDetail.Id}")' />
+                        </BFUStack>
+                    }
+                </AuthorizeView>
+
+                <hr />
+                <!-- Video Frame -->
+                <iframe style="width:95%"
+                        height="500"
+                        src="@videoDetail.VideoUrl"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                <hr />
+                <ul>
+                    <li>@videoDetail.Description</li>
+                    <li>@videoDetail.Category</li>
+                    <li>@videoDetail.PublishingDate</li>
+                </ul>
+
+
+            </BFUStack>
+        </BFUStackItem>
 
         <BFUStackItem Style="width:40%">
             <dotNetLabs.Blazor.Pages.Comments.Comments VideoId="@Id"
                                                        CommentsList="commentsList" />
         </BFUStackItem>
     </BFUStack>
-   
+
 }
 
 @code {
@@ -59,6 +70,8 @@ else if (videoDetail != null)
         else
             await FetchVideoAsync(Id);
     }
+
+    #region Fetch
 
     private async Task FetchVideoAsync(string id)
     {
@@ -82,4 +95,29 @@ else if (videoDetail != null)
         }
         isBusy = false;
     }
+    #endregion
+
+    #region Delete
+    private async Task DeleteVideoAsync(string id)
+    {
+        isBusy = true;
+        try
+        {
+            var response = await httpClient.DeleteAsync($"/api/videos/delete?id={id}");
+            if (response.IsSuccessStatusCode)
+            {
+                navigationManager.NavigateTo("/videos");
+            }
+            else
+            {
+                Console.WriteLine("Something went wrong");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        isBusy = false;
+    }
+    #endregion
 }

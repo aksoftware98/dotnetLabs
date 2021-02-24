@@ -23,6 +23,21 @@ Register:
 
 Videos:
  Title: Our Videos
+ Name: Title
+ Create: Create a new video
+ Description: Description
+ Category: Category
+ VideoURL: Video URL
+ ThumbImage: Thumbnail
+ Tags: Tags
+ SelectCategory: Select a category
+ Submit: Submit
+ UploadValidImageFile: Selected image file is not a valid image file
+ UploadedFileShouldBeSmall: Please do not upload a high resolution image
+ ThumbIsRequired: Please choose a thumbnail image
+ Edit: Edit Video
+ AddVideo: Add Video
+
 
 Comments:
  Comments: Comments 

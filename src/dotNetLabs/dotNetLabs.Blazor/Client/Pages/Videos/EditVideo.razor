@@ -1,0 +1,195 @@
+﻿@page "/videos/edit/{id}"
+
+@inject HttpClient httpClient
+@inject ILanguageContainerService language
+@inject NavigationManager navigationManager
+
+@using System.IO
+
+@attribute [Authorize(Roles = "Admin")]
+
+
+<h3>@language["Videos:Edit"]</h3>
+
+
+@if (isBusy)
+{
+    <BFUSpinner Size="SpinnerSize.Large" />
+}
+else if (model != null)
+{
+
+    <EditForm Model="model" OnValidSubmit="@EditVideoAsync">
+
+        <div class="textFieldDiv">
+            <BFUTextField Label="@language["Videos:Name"]" @bind-Value="model.Title" />
+        </div>
+        <div class="textFieldDiv">
+            <BFUTextField Multiline="true" Label="@language["Videos:Description"]" @bind-Value="model.Description" />
+        </div>
+        <div class="textFieldDiv">
+            <BFUTextField Label="@language["Videos:VideoURL"]" @bind-Value="model.VideoUrl" />
+        </div>
+        <div class="textFieldDiv">
+            <label>@language["Videos:ThumbImage"]</label>
+            <InputFile OnChange="OnSelectFileAsync" />
+            <img src="@model.ThumpUrl" style="width:80px;margin:5px" />
+        </div>
+        <div class="textFieldDiv">
+            <BFUTextField Label="@language["Videos:Tags"]" @bind-Value="model.TagsAsString" />
+        </div>
+
+        <div class="textFieldDiv">
+            <label>@language["Videos:Category"]</label>
+            <select style="width:300px" @onchange="OnSelectCategory">
+                @foreach (var item in categories)
+                {
+                    <option value="@item" selected="@(item == model.Category.ToString())">@item</option>
+                }
+            </select>
+        </div>
+        <BFUButtonBase Text="@language["Videos:Submit"]" Disabled="isBusy" />
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <BFUMessageBar MessageBarType="MessageBarType.Error" IsMultiline="false">
+                @message
+            </BFUMessageBar>
+        }
+
+        @if (isBusy)
+        {
+            <BFUSpinner Size=@SpinnerSize.Large></BFUSpinner>
+        }
+
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private bool isBusy = false;
+    private VideoDetail model = null;
+    private string message = string.Empty;
+
+    private IEnumerable<string> categories = new[]
+    {
+        "Education", "Sport", "Music", "Space", "Entertainment"
+    };
+
+    #region Fetch
+    private async Task FetchVideoAsync(string id)
+    {
+        isBusy = true;
+        try
+        {
+            var result = await httpClient.GetFromJsonAsync<OperationResponse<VideoDetail>>($"/api/videos/{id}");
+            if (result.IsSuccess)
+            {
+                model = result.Data;
+                model.TagsAsString = string.Join(",", model.Tags);
+
+                Console.WriteLine(model.Comments.Count());
+            }
+            else
+            {
+                // TODO: Show an error message
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        isBusy = false;
+    }
+    #endregion
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            navigationManager.NavigateTo("/videos");
+
+        await FetchVideoAsync(Id);
+    }
+
+    private async Task EditVideoAsync()
+    {
+
+        var content = new MultipartFormDataContent();
+        content.Add(new StringContent(model.Id), "Id");
+        content.Add(new StringContent(model.Title), "Title");
+        if (!string.IsNullOrEmpty(model.Description))
+            content.Add(new StringContent(model.Description), "Description");
+        content.Add(new StringContent(model.Category.ToString()), "Category");
+        content.Add(new StringContent(model.VideoUrl), "VideoUrl");
+        var tags = model.TagsAsString.Split(',');
+        foreach (var tag in tags)
+        {
+            content.Add(new StringContent(tag), "Tags");
+        }
+        if (msStream != null)
+            content.Add(new StreamContent(msStream), "ThumpFile", fileName);
+
+        isBusy = true;
+        try
+        {
+            var response = await httpClient.PutAsync("/api/videos/update", content);
+            var responseContent = await response.Content.ReadFromJsonAsync<OperationResponse<VideoDetail>>();
+            Console.WriteLine(responseContent.Message);
+            if (response.IsSuccessStatusCode)
+            {
+                navigationManager.NavigateTo($"/videos/details/{model.Id}");
+            }
+            else
+            {
+                message = responseContent.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            message = ex.Message;
+        }
+        isBusy = false;
+    }
+
+    #region Read File
+    MemoryStream msStream = null;
+    string fileName = string.Empty;
+
+    private async Task OnSelectFileAsync(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > 0)
+        {
+            string extension = System.IO.Path.GetExtension(e.File.Name);
+            var allowedExtensions = new[] { ".jpg", ".png" };
+            if (!allowedExtensions.Contains(extension))
+            {
+                message = language["Videos:UploadValidImageFile"];
+                return;
+            }
+            if (e.File.Size > 500000)
+            {
+                message = language["Videos:UploadedFileShouldBeSmall"];
+                return;
+            }
+            using (var stream = e.File.OpenReadStream())
+            {
+                msStream = new MemoryStream();
+                await stream.CopyToAsync(msStream);
+                msStream.Position = 0;
+            }
+            fileName = e.File.Name;
+        }
+    }
+
+    #endregion
+
+    private void OnSelectCategory(ChangeEventArgs e)
+    {
+        model.Category = Enum.Parse<Category>(e.Value.ToString());
+    }
+
+}
