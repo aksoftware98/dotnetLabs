@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AKSoftware.Localization.MultiLanguages;
 using System.Reflection;
+using MudBlazor.Services;
 
 namespace dotNetLabs.Blazor
 {
@@ -32,7 +33,7 @@ namespace dotNetLabs.Blazor
 
             builder.Services.AddScoped<AuthenticationStateProvider, LocalAuthenticationStateProvider>(); 
 
-            builder.Services.AddBlazorFluentUI();
+            builder.Services.AddMudServices();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddAuthorizationCore();
             builder.Services.AddLanguageContainer(Assembly.GetExecutingAssembly()); 

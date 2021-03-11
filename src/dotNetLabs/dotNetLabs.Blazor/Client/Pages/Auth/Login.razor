@@ -18,13 +18,13 @@
         <BFUTextField Label="@language["Auth:Password"]" InputType="InputType.Password" @bind-Value="model.Password" />
     </div>
 
-    <BFUButtonBase Text="@language["Auth:Login"]" Disabled="isBusy" />
+    <MudButton Text="@language["Auth:Login"]" Disabled="isBusy" />
 
     @if (!string.IsNullOrWhiteSpace(message))
     {
-        <BFUMessageBar MessageBarType="MessageBarType.Error" IsMultiline="false">
+        <MudAlert MessageBarType="MessageBarType.Error" IsMultiline="false">
             @message
-        </BFUMessageBar>
+        </MudAlert>
     }
 
     @if (isBusy)
